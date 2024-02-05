@@ -7,6 +7,7 @@ use piston::Button::Keyboard;
 use piston::Event::Input;
 use piston::Input::Button;
 use piston_window::*;
+use rand::prelude::*;
 
 fn main() {
     let mut window: PistonWindow = WindowSettings::new("Rust Snake", [640, 480])
@@ -15,10 +16,12 @@ fn main() {
         .fullscreen(false)
         .build().unwrap();
 
-    let frame_time: f64 = 0.2;
+    let frame_time: f64 = 0.25;
     let mut passed: f64 = 0.0;
 
-    let mut snake = Snake::new(64, 48, 5);
+    let mut rng = thread_rng();
+    let mut snake = Snake::new(32, 24, 3);
+    let mut food = Position::new(rng.gen_range(0..32), rng.gen_range(0..24));
 
     while let Some(event) = window.next() {
         let dt = event.update_args().map_or(0.0, |args| args.dt);
@@ -41,13 +44,23 @@ fn main() {
         }
 
         window.draw_2d(&event, |context, graphics, _device| {
-            clear([1.0; 4], graphics);
+            clear([0.05; 4], graphics);
             for segment in snake.segments.iter() {
-                rectangle([1.0, 0.0, 0.0, 1.0], // red
-                          [segment.x as f64 * 10.0, segment.y as f64 * 10.0, 10.0, 10.0],
+                rectangle([247.0/255.0, 127.0/255.0, 190.0/255.0, 1.0],
+                          [segment.x as f64 * 20.0, segment.y as f64 * 20.0, 20.0, 20.0],
                           context.transform,
                           graphics)
             }
+            rectangle([1.0, 0.0, 0.0, 1.0],
+                      [food.x as f64 * 20.0, food.y as f64 * 20.0, 20.0, 20.0],
+                      context.transform,
+                      graphics)
         });
+
+        if snake.head() == food {
+            snake.eat();
+            food.x = rng.gen_range(0..32);
+            food.y = rng.gen_range(0..24);
+        }
     }
 }

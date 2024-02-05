@@ -3,6 +3,7 @@ use std::collections::VecDeque;
 pub struct Snake {
     pub segments: VecDeque<Position>,
     direction: Direction,
+    segments_to_add: i32,
     max_x: i32,
     max_y: i32,
 }
@@ -29,6 +30,7 @@ impl Snake {
             direction: Direction::Up,
             max_x,
             max_y,
+            segments_to_add: 0
         }
     }
 
@@ -47,13 +49,25 @@ impl Snake {
             if new_head.y > self.max_y { new_head.y = 0 }
             self.segments.push_front(new_head);
         }
-        self.segments.pop_back();
+        if self.segments_to_add == 0 {
+            self.segments.pop_back();
+        } else {
+            self.segments_to_add -= 1;
+        }
     }
 
     pub fn turn(&mut self, direction: Direction) {
         if self.direction.is_allowed_turn(direction) {
             self.direction = direction;
         }
+    }
+
+    pub fn eat(&mut self) {
+        self.segments_to_add += 5;
+    }
+
+    pub fn head(&self) -> Position {
+        *self.segments.front().unwrap()
     }
 }
 
