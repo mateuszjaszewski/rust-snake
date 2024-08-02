@@ -57,6 +57,10 @@ impl Snake {
     pub fn head(&self) -> Position {
         *self.segments.front().unwrap()
     }
+
+    pub fn has_collision(&self) -> bool {
+        self.segments.range(1..).find(|&&x| x==self.head()).is_some()
+    }
 }
 
 impl Renderable for Snake {

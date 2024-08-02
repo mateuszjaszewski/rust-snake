@@ -12,6 +12,8 @@ use food::Food;
 use crate::renderer::{BACKGROUND_COLOR, Renderable};
 
 const FRAME_TIME: f64 = 0.25;
+const SNAKE_INIT_LENGTH: u8 = 3;
+
 pub struct Game {
     area: Area,
     snake: Snake,
@@ -28,7 +30,7 @@ impl Game {
     pub fn new(max_x: i32, max_y: i32) -> Self {
         let area = Area { max_x, max_y };
         let food = Food::new(&area);
-        let snake = Snake::new(&area, 3);
+        let snake = Snake::new(&area, SNAKE_INIT_LENGTH);
         Self { area, food, snake, current_frame_time: 0.0 }
     }
 
@@ -52,6 +54,9 @@ impl Game {
         if self.snake.head() == self.food {
             self.snake.eat();
             self.food = Food::new(&self.area)
+        }
+        if self.snake.has_collision() {
+            self.snake = Snake::new(&self.area, SNAKE_INIT_LENGTH)
         }
     }
 }
